@@ -10,7 +10,8 @@ import _ from 'lodash';
 import Dices from './dices.js';
 import CardsView from './cards.js';
 import ResetButton from './reset_button.js';
-
+import WebRTC from './webRTC.js';
+import SimpleWebRTC from 'simplewebrtc';
 
 const socket = io.connect();
 
@@ -21,8 +22,8 @@ export default class App extends React.Component {
       users: [],
       victoryPoints: [0, 0, 0, 0, 0, 0],
       healthPoints: [10, 10, 10, 10, 10, 10],
-      energy: [10, 10, 10, 10, 10, 10],
-      currentUser: 0,
+      energy: [0, 0, 0, 0, 0, 0],
+      currentUser: 1,
       currentTurn: 1,
       otherPlayers: [],
       currentEmperor: -1,
@@ -46,7 +47,7 @@ export default class App extends React.Component {
     socket.on('updateUserNicknames', this._updateUserNicknames.bind(this));
     socket.on('startGame', this._onGameStart.bind(this));
   }
-
+  
   _updateUserMonsters(userMonsters) {
     this.setState({ userMonsters });
   }
@@ -61,11 +62,33 @@ export default class App extends React.Component {
 
   _onGameStart(gameStart) {
     this.setState({ gameStart });
+    const room = 'raa';
+    const webrtc = new SimpleWebRTC({
+      // the element that will hold local video
+      localVideoEl: 'localVideo',
+      // the element that will hold remote videos
+      remoteVideosEl: 'remotes',
+      autoRequestMedia: true,
+      log: true,
+    });
+    console.log(this.state.currentUser);
+    if (this.state.currentUser===0) {
+      webrtc.createRoom(room, function(err, name) {
+        if (!err) {
+          console.log('raaaaa');
+        }
+      });       
+    } 
+    webrtc.on('readyToCall', () => {
+      webrtc.joinRoom(room);
+    });
   }
 
   _updateUserNicknames(userNicknames) {
     this.setState({ userNicknames });
   }
+
+
 
   _userConnect(newPlayer) {
     const otherPlayerIDs = newPlayer;

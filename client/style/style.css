@@ -109,3 +109,10 @@ tr {
   transition: opacity 300ms ease-in;
 }
 
+video {
+  display: inline-block;
+  float: left;  
+  padding: 0px;
+  margin: 0px;
+}
+
